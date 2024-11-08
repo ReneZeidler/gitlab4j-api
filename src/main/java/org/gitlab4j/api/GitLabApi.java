@@ -9,6 +9,8 @@ import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -874,11 +876,33 @@ public class GitLabApi implements AutoCloseable {
 
     /**
      * Sets up the Jersey system ignore SSL certificate errors or not.
+     * This overwrites any previously set SSLContext using {@link #setSslContext(SSLContext)}.
      *
      * @param ignoreCertificateErrors if true will set up the Jersey system ignore SSL certificate errors
      */
     public void setIgnoreCertificateErrors(boolean ignoreCertificateErrors) {
         apiClient.setIgnoreCertificateErrors(ignoreCertificateErrors);
+    }
+
+    /**
+     * Sets up the Jersey system to use a custom SSLContext for certificate validation.
+     * This overwrites any previous invocation of {@link #setIgnoreCertificateErrors(boolean)}.
+     *
+     * @param sslContext SSLContext object to use
+     */
+    public void setSslContext(SSLContext sslContext) {
+        apiClient.setSslContext(sslContext, null);
+    }
+
+    /**
+     * Sets up the Jersey system to use a custom SSLContext and HostnameVerifier for certificate validation.
+     * This overwrites any previous invocation of {@link #setIgnoreCertificateErrors(boolean)}.
+     *
+     * @param sslContext SSLContext object to use
+     * @param hostnameVerifier HostnameVerifier object to use
+     */
+    public void setSslContext(SSLContext sslContext, HostnameVerifier hostnameVerifier) {
+        apiClient.setSslContext(sslContext, hostnameVerifier);
     }
 
     /**

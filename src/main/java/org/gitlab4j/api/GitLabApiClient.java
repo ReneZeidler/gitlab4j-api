@@ -841,8 +841,11 @@ public class GitLabApiClient implements AutoCloseable {
         clientBuilder.register(JacksonJson.class);
         clientBuilder.register(JacksonFeature.class);
 
-        if (ignoreCertificateErrors) {
-            clientBuilder.sslContext(openSslContext).hostnameVerifier(openHostnameVerifier);
+        if (openSslContext != null) {
+            clientBuilder.sslContext(openSslContext);
+        }
+        if (openHostnameVerifier != null) {
+            clientBuilder.hostnameVerifier(openHostnameVerifier);
         }
 
         apiClient = clientBuilder.build();
@@ -925,6 +928,7 @@ public class GitLabApiClient implements AutoCloseable {
 
     /**
      * Sets up the Jersey system ignore SSL certificate errors or not.
+     * This overwrites any previously set SSLContext using {@link #setSslContext(SSLContext, HostnameVerifier)}.
      *
      * @param ignoreCertificateErrors if true will set up the Jersey system ignore SSL certificate errors
      */
@@ -1013,6 +1017,20 @@ public class GitLabApiClient implements AutoCloseable {
         }
 
         return (true);
+    }
+
+    /**
+     * Sets up the Jersey system to use a custom SSLContext and HostnameVerifier for certificate validation.
+     * This overwrites any previous invocation of {@link #setIgnoreCertificateErrors(boolean)}.
+     *
+     * @param sslContext SSLContext object to use
+     * @param hostnameVerifier HostnameVerifier object to use
+     */
+    public void setSslContext(SSLContext sslContext, HostnameVerifier hostnameVerifier) {
+        this.ignoreCertificateErrors = false;
+        this.openSslContext = sslContext;
+        this.openHostnameVerifier = hostnameVerifier;
+        this.apiClient = null;
     }
 
     /**
